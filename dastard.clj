@@ -106,19 +106,24 @@
 (def *coord-systems* (db-query-table "select id, name, map_master from das_reference"))
 
 (defn- front-page [request]
-  (html [:img {:src "/biodas_logo.png"}]
-        [:h1 "WebDastard"]
-        [:p [:a {:href "/upload"} "Add new datasource..."]]
-  	[:table {:border 1} [:tr [:th "Name" [:br] "(Click to manage)"] [:th "Reference"] [:th "Description"] [:th "Activate"]]
-	(map (fn [x]
-	       (let [[name desc csid] x]
-	         (html [:tr [:td name] 
-		       	    [:td (second (some (fn [x]
+  (html [:head [:title "WebDastard"]
+	       [:link {:rel "stylesheet" :href "/style.css" :type "text/css"}]]
+      [:body
+        [:div#sidebar
+	 [:img {:src "/dastard.png"}]]
+        [:div#content-holder [:div#main
+          [:h1 "WebDastard"]
+          [:p [:a {:href "/upload"} "Add new datasource..."]]
+  	  [:table {:border 1} [:tr [:th "Name" [:br] "(Click to manage)"] [:th "Reference"] [:th "Description"] [:th "Activate"]]
+	  (map (fn [x]
+	         (let [[name desc csid] x]
+	           (html [:tr [:td name] 
+	  	       	    [:td (second (some (fn [x]
 			    	       	         (if (= (first x) csid) x))
 					       *coord-systems*))] 
 			    [:td desc] 
 			    [:td "E! Daliance UCSC"]])))
-             (db-query-table "select name, description, reference from das_source"))]))
+               (db-query-table "select name, description, reference from das_source"))]]]]))
 
 (defn- upload-page [request]
   (let [session (get request :session)
